@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  wanted-crawler:
+    build: ./crawler_wanted
+    container_name: crawler_wanted
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+
+  jumpit-crawler:
+    build: ./crawler_jumpit
+    container_name: crawler_jumpit
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+
+volumes:
+  mongo-data:
