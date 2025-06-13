@@ -1,0 +1,26 @@
+name: 📝 Task
+description: 구현할 기능 또는 작업을 정리할 때 사용하세요
+labels: [task]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: 📌 작업 제목
+      placeholder: 예) 공고 리스트 API 페이징 기능 추가
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: 💡 작업 설명
+      description: 어떤 기능을 구현해야 하는지 상세히 설명해주세요
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 체크리스트
+      options:
+        - label: 테스트 코드 작성
+        - label: API 문서 업데이트
+        - label: 관련 PR 연결

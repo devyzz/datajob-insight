@@ -1,0 +1,47 @@
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
+
+# Ignore test artifacts
+*.log
+*.tmp
+*.bak
+.cache/
+.ipynb_checkpoints/
+coverage/
+*.cover
+htmlcov/
+
+# Ignore environment files
+.env
+.env.*
+
+# Ignore OS / Editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Ignore virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Ignore Git
+.git/
+.gitignore
+
+# Ignore build outputs
+dist/
+build/
+*.tar.gz
+*.zip
+*.tgz
+
+# Ignore Docker-specific files not needed inside image
+docker-compose.override.yml

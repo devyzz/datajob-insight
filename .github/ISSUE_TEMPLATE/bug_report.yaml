@@ -1,0 +1,21 @@
+name: 🐛 Bug Report
+description: 기능이 예상대로 동작하지 않을 때 사용하세요
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: ❗ 버그 내용
+      description: 어떤 현상이 발생했는지 설명해주세요
+      placeholder: ex) 필터 버튼을 눌렀는데 반응이 없음
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: ▶ 재현 방법
+      description: 문제를 재현할 수 있는 절차를 설명해주세요
+      placeholder: 1. ... > 2. ... > 3. ...
+    validations:
+      required: true
