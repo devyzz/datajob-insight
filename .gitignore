@@ -1,0 +1,68 @@
+# === Python 기본 ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# === 환경변수 ===
+.env
+.env.*
+
+# === IDE 설정 ===
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# === 로그, 캐시, 임시 파일 ===
+*.log
+*.tmp
+*.bak
+*.orig
+*.db
+*.sqlite3
+.cache/
+.ipynb_checkpoints/
+
+# === Docker 관련 ===
+*.pid
+*.pid.lock
+*.sock
+docker-compose.override.yml
+
+# === 테스트/커버리지 ===
+.coverage
+htmlcov/
+.tox/
+.nox/
+pytest_cache/
+
+# === 파이썬 가상환경 ===
+.venv/
+venv/
+ENV/
+env/
+
+# === Streamlit ===
+.streamlit/config.toml
+.streamlit/secrets.toml
+
+# === Airflow (ETL-service) ===
+airflow.cfg
+airflow.db
+logs/
+
+# === MongoDB Dump or MinIO artifacts ===
+dump/
+uploads/
+minio-data/
+
+# === 기타 ===
+*.tar.gz
+*.zip
+*.tgz
