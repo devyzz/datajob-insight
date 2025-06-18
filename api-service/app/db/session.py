@@ -12,7 +12,7 @@ import logging # 로깅 임포트
 logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG) # DEBUG 레벨로 더 상세한 로깅 (파라미터, 결과셋 등)
 logging.getLogger('sqlalchemy.orm').setLevel(logging.DEBUG) # ORM 관련 상세 로깅
 
-SQLALCHEMY_DATABASE_URL = common_settings.DATABASE_URL 
+SQLALCHEMY_DATABASE_URL = common_settings.POSTGREDB_URL 
 
 # echo=True 또는 echo="debug" 옵션도 유사한 효과를 냅니다.
 # engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)

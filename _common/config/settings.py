@@ -8,7 +8,7 @@ DOTENV_PATH = PROJECT_ROOT_DIR / ".env"
 
 class CommonSettings(BaseSettings):
     # 데이터베이스 설정
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:pass@host:port/db")
+    POSTGREDB_URL: str = os.getenv("POSTGREDB_URL", "postgresql://user:pass@host:port/db")
     API_SERVICE_BASE_URL: str = os.getenv("API_SERVICE_BASE_URL", "http://localhost:8000") 
     
     class Config:
