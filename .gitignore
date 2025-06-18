@@ -8,6 +8,7 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+venv/
 
 # === 환경변수 ===
 .env
