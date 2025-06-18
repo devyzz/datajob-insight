@@ -3,8 +3,7 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from ..db.session import Base
 
 class JobGrid(Base):
-    # __tablename__ = "JobPosting" # "JobPosting"에서 "jobposting" (모두 소문자)으로 변경
-    __tablename__ = "jobposting" # 
+    __tablename__ = "jobposting" 
     
     posting_id = Column(Integer, primary_key=True, index=True)
     company_id = Column(Integer)
