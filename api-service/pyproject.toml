@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "api-service"
+version = "0.1.0"
+description = "API service for DataJob Insight"
+authors = ["yezi <y.wintering@gmail.com>"]
+packages = [
+    { include = "config" },
+    { include = "schema" },
+    { include = "utils" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.29.0"}
+sqlalchemy = "^2.0.30"
+psycopg2-binary = "^2.9.9"
+pydantic = "^2.7.1"
+pydantic-settings = "^2.2.1"
+
+# dev 그룹을 명시적으로 정의 (내용은 비어 있어도 됨)
+[tool.poetry.group.dev.dependencies]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+start = "api-service.app.main:app"    
