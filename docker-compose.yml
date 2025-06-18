@@ -1,29 +1,43 @@
 version: "3.8"
 
 services:
-  mongo:
-    image: mongo:6.0
-    container_name: mongo
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "27017:27017"
+      - "${POSTGRES_PORT}:5432"
     volumes:
-      - mongo-data:/data/db
+      - postgres-data:/var/lib/postgresql/data
+      - ./setup_pg_scripts.sql:/docker-entrypoint-initdb.d/setup_pg_scripts.sql
+    restart: unless-stopped
 
-  wanted-crawler:
-    build: ./crawler_wanted
-    container_name: crawler_wanted
-    depends_on:
-      - mongo
+  api-service:
+    build:
+      context: . # 프로젝트 루트를 빌드 컨텍스트로 설정하여 _common에 접근
+      dockerfile: api-service/Dockerfile # 사용할 Dockerfile 경로
+    container_name: api_service_container
+    ports:
+      - "8000:8000"
     env_file:
-      - .env
+      - .env # .env 파일에서 환경 변수 로드
+    depends_on:
+      - postgres # postgres 서비스가 시작된 후에 실행
+    restart: unless-stopped
 
-  jumpit-crawler:
-    build: ./crawler_jumpit
-    container_name: crawler_jumpit
-    depends_on:
-      - mongo
+  web-jobposting-service:
+    build:
+      context: . # 프로젝트 루트를 빌드 컨텍스트로 설정하여 _common에 접근
+      dockerfile: web-jobposting-service/Dockerfile # 사용할 Dockerfile 경로
+    container_name: web_jobposting_service_container
+    ports:
+      - "8001:8001"
     env_file:
-      - .env
+      - .env # .env 파일에서 환경 변수 로드
+    restart: unless-stopped
 
 volumes:
-  mongo-data:
+  postgres-data:
