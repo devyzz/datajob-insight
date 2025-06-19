@@ -1,0 +1,13 @@
+# 크롤러 crontab 설정
+# 형식: 분 시 일 월 요일 명령어
+
+# 매일 오전 9시에 전체 크롤러 실행
+0 9 * * * cd /app && ./run_crawlers.sh >> /app/logs/cron.log 2>&1
+
+# 매일 오후 6시에 전체 크롤러 실행  
+0 18 * * * cd /app && ./run_crawlers.sh >> /app/logs/cron.log 2>&1
+
+# 매주 일요일 오전 3시에 풀 크롤링
+0 3 * * 0 cd /app && ./run_crawlers.sh full >> /app/logs/cron.log 2>&1
+
+# 빈 줄 필수 (cron 요구사항)

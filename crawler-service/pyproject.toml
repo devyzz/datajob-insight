@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "crawler-service"
+version = "0.1.0"
+description = "Crawling Service for Datajob Insights"
+authors = ["jjlee <cx7achim@naver.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "3.12.3"
+requests = "^2.32.4"
+beautifulsoup4 = "^4.13.4"
+lxml = "^5.4.0"
+playwright = "^1.52.0"
+pymongo = "^4.13.2"
+dnspython = "^2.7.0"
+python-dateutil = "^2.9.0.post0"
+python-dotenv = "^1.1.0"
+pytest = "^8.4.1"
+pytest-cov = "^6.2.1"
+black = "^25.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
