@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 크롤러 병렬 실행 스크립트 (심플 버전)
+# 크롤러 순차 실행 스크립트
 # Usage: ./run_crawlers.sh [mode] [mongodb_uri]
 #   mode: normal(기본값) | full
 #   mongodb_uri: MongoDB 연결 주소 (기본값: mongodb://localhost:27017/)
@@ -35,7 +35,7 @@ fi
 
 # 도움말 표시
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-    echo -e "${GREEN}🚀 크롤러 병렬 실행 스크립트${NC}"
+    echo -e "${GREEN}🚀 크롤러 순차 실행 스크립트${NC}"
     echo ""
     echo -e "${YELLOW}사용법:${NC}"
     echo "  ./run_crawlers.sh [mode] [mongodb_uri]"
@@ -63,11 +63,24 @@ if [ "$MODE" != "normal" ] && [ "$MODE" != "full" ]; then
     exit 1
 fi
 
+# Playwright 브라우저 설치 확인 및 설치
+echo -e "${BLUE}🔍 Playwright 브라우저 설치 상태 확인 중...${NC}"
+if ! poetry run python -c "import playwright; from playwright.sync_api import sync_playwright; p = sync_playwright().start(); p.chromium.launch(); p.stop()" &>/dev/null; then
+    echo -e "${YELLOW}⚠️ Playwright 브라우저가 설치되지 않았습니다. 설치를 시작합니다...${NC}"
+    if poetry run playwright install; then
+        echo -e "${GREEN}✅ Playwright 브라우저 설치 완료${NC}"
+    else
+        echo -e "${RED}❌ Playwright 브라우저 설치 실패${NC}"
+        exit 1
+    fi
+else
+    echo -e "${GREEN}✅ Playwright 브라우저 설치 확인됨${NC}"
+fi
+
 # 사이트 목록
 declare -a SITES=("wanted" "saramin" "jobkorea")
-declare -a PIDS=()
 
-echo -e "${GREEN}🚀 크롤러 서비스 병렬 실행${NC}"
+echo -e "${GREEN}🚀 크롤러 서비스 순차 실행${NC}"
 echo -e "${BLUE}📊 MongoDB URI: ${MONGODB_URI}${NC}"
 echo -e "${BLUE}🔧 실행 모드: ${MODE}${NC}"
 if [ -n "$MONGODB_ARG" ]; then
@@ -91,49 +104,28 @@ for site in "${SITES[@]}"; do
 done
 echo "=================================="
 
-# 각 사이트별 크롤러 실행
+# 각 사이트별 크롤러 순차 실행
 for site in "${SITES[@]}"; do
     echo -e "${BLUE}🎯 ${site} 크롤러 시작...${NC}"
-    
+
     # 명령어 구성
     if [ "$MODE" = "full" ]; then
         CMD="CRAWLER_SERVICE_MONGODB_URI=\"${MONGODB_URI}\" poetry run python main.py --site ${site} --full"
     else
         CMD="CRAWLER_SERVICE_MONGODB_URI=\"${MONGODB_URI}\" poetry run python main.py --site ${site}"
     fi
-    
+
     echo -e "${YELLOW}   실행: ${CMD}${NC}"
-    
-    # 백그라운드 실행
-    eval $CMD > /dev/null 2>&1 &
-    PID=$!
-    PIDS+=($PID)
-    
-    echo -e "${GREEN}✅ ${site} 크롤러 시작됨 (PID: ${PID})${NC}"
-    
-    # 2초 간격으로 실행 (DB 부하 분산)
-    sleep 2
+
+    # 순차 실행 (출력 표시)
+    if eval $CMD; then
+        echo -e "${GREEN}✅ ${site} 크롤러 완료${NC}"
+    else
+        echo -e "${RED}❌ ${site} 크롤러 실행 실패${NC}"
+        exit 1
+    fi
+
+    echo ""
 done
 
-echo ""
-echo -e "${GREEN}🎉 모든 크롤러가 백그라운드에서 실행 중!${NC}"
-echo -e "${BLUE}📋 실행 중인 PID: ${PIDS[*]}${NC}"
-
-echo ""
-echo -e "${YELLOW}📊 모니터링 명령어:${NC}"
-echo "  프로세스 상태: ps aux | grep 'python main.py'"
-echo "  모든 크롤러 종료: pkill -f 'python main.py'"
-
-echo ""
-echo -e "${BLUE}⏳ 모든 크롤러 완료까지 대기 중...${NC}"
-
-# 모든 프로세스 완료까지 대기
-for i in "${!PIDS[@]}"; do
-    PID=${PIDS[$i]}
-    SITE=${SITES[$i]}
-    echo -e "${YELLOW}⏳ ${SITE} 크롤러 대기 중 (PID: ${PID})...${NC}"
-    wait $PID
-    echo -e "${GREEN}✅ ${SITE} 크롤러 완료${NC}"
-done
-
-echo -e "${GREEN}🎉 모든 크롤러가 완료되었습니다!${NC}"
+echo -e "${GREEN}🎉 모든 크롤러가 순차적으로 완료되었습니다!${NC}"

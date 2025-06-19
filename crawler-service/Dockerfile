@@ -1,5 +1,5 @@
 # 크롤러 서비스 Dockerfile (Poetry 기반)
-FROM python:3.12-slim
+FROM python:3.12.3-slim
 
 # 작업 디렉토리 설정
 WORKDIR /app

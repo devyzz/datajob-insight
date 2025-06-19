@@ -58,18 +58,19 @@ echo "CRAWLER_SERVICE_MONGODB_URI=mongodb://your-mongodb-host:27017/job_crawler"
 
 #### 단발성 실행 (개발/테스트용)
 ```bash
+# 커스텀 MongoDB URI로 실행 (*메인* 원격 몽고DB에 원티드 사람인 잡코리아 채용공고를 순차적으로 크롤링) 
+# CUSTOM_DB_IP 는 discord에서 공유한 원격 DB ip입니다!
+CRAWLER_SERVICE_MONGODB_URI="mongodb://CUSTOM_DB_IP:27017/job_crawler" \
+docker-compose run --rm crawler ./run_crawlers.sh
+
+# 모든 사이트 크롤링 수행 (모든디폴트옵션으로 | 로컬 mongoDB | loglevel=INFO | normal모드)
+docker-compose run --rm crawler ./run_crawlers.sh
+
 # 특정 사이트만 실행
 docker-compose run --rm crawler python main.py --site wanted
 
-# 전체 크롤링
+# 전체 크롤링 (--full모드는 첫페이지부터 끝페이지까지 다 긁는다)
 docker-compose run --rm crawler python main.py --site wanted --full
-
-# 모든 사이트 병렬 실행
-docker-compose run --rm crawler ./run_crawlers.sh
-
-# 커스텀 MongoDB URI로 실행
-CRAWLER_SERVICE_MONGODB_URI="mongodb://custom-host:27017/job_crawler" \
-docker-compose run --rm crawler ./run_crawlers.sh
 ```
 
 #### 주기적 실행 (운영용)
@@ -87,7 +88,7 @@ docker-compose down
 ### 2. 로컬 환경 설정
 
 #### 시스템 요구사항
-- Python 3.12+
+- Python 3.12+(=3.12.3-slim)
 - Poetry (의존성 관리)
 - MongoDB 접근 권한
 
@@ -109,16 +110,15 @@ poetry install
 # 4. Playwright 브라우저 설치
 poetry run playwright install chromium
 
-# 5. 환경변수 설정 파일 생성
+# 5. (선택)환경변수 설정 파일 생성 .env 파일에서 MongoDB URI 수정)
 cp .env.example .env
-# .env 파일에서 MongoDB URI 수정
+
 ```
 
 #### 환경변수 설정
 ```bash
-# 방법 1: .env 파일 사용 (권장)
+# 방법 1: .env 파일 사용 (선택)
 cp .env.example .env
-
 # .env 파일 내용 수정
 CRAWLER_SERVICE_MONGODB_URI=mongodb://your-mongodb-host:27017/job_crawler
 LOG_LEVEL=INFO
@@ -126,7 +126,6 @@ LOG_LEVEL=INFO
 # 방법 2: 직접 export
 export CRAWLER_SERVICE_MONGODB_URI="mongodb://your-mongodb-host:27017/job_crawler"
 export LOG_LEVEL="INFO"
-
 # 인증이 필요한 경우
 export CRAWLER_SERVICE_MONGODB_URI="mongodb://username:password@host:27017/job_crawler?authSource=admin"
 ```
@@ -358,7 +357,27 @@ docker-compose build --no-cache
 ## 🔧 개발 정보
 
 ### 크롤링 코드 구조
-[[]]
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   📋 Wanted     │    │   👥 Saramin   │    │   💼 Jobkorea   │
+│   (API 기반)    │     │  (봇탐지 회피)   │    │ (카테고리 분할)   │
+└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
+          │                      │                      │
+          └──────────┬──────────────────┬────────────────┘
+                     │                  │
+          ┌──────────▼──────────────────▼─────────┐
+          │         🤖 크롤링 엔진                 │
+          │    (Factory Pattern + 병렬처리)        │
+          └──────────┬────────────────────────────┘
+                     │
+          ┌──────────▼────────────────────────────┐
+          │         🔄 데이터 정규화               │
+          │     (직무분류, 기술스택 표준화)          │
+          └──────────┬────────────────────────────┘
+                     │
+          ┌──────────▼────────────────────────────┐
+          │         💾 MongoDB                    │
+          │    (중복제거 + 1차로 정규화된 상태로저장)  │
+          └───────────────────────────────────────┘
 
 ### 기술 스택
 - **언어**: Python 3.12
@@ -367,16 +386,7 @@ docker-compose build --no-cache
 - **데이터베이스**: MongoDB, PyMongo
 - **컨테이너화**: Docker, Docker Compose
 
-### 확장 방법
-새로운 플랫폼 추가시:
-1. `crawler/` 디렉토리에 새 크롤러 클래스 생성
-2. `JobCrawler` 기본 클래스 상속
-3. `_get_job_urls()`, `_crawl_job_detail()` 메서드 구현
-4. `config/site_configs.py`에 설정 추가
-5. `CrawlerFactory`에 등록
-
 ## ⚠️ 주의사항 및 팁
-
 ### 실행 관련
 - **MongoDB 연결**: 크롤러 실행 전 MongoDB 서버가 실행 중인지 확인
 - **방화벽**: MongoDB 포트(기본 27017)가 열려있는지 확인
@@ -426,6 +436,3 @@ docker-compose build --no-cache
 # 컨테이너 로그 실시간 확인
 docker-compose logs -f crawler-cron
 ```
-
-## 📝 라이선스
-MIT License
