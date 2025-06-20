@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+  mongo_db:
+    image: mongo:6.0
+    container_name: mongo_db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example_pw
+    ports:
+      - "27017:27017"
+
+  postgres_db:
+    image: postgres:14
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpass
+      POSTGRES_DB: jobdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  etl:
+    image: python:3.9-slim
+    container_name: etl_service
+    working_dir: /app
+    volumes:
+      - ./:/app
+    env_file:
+      - ./.env
+    # 여기서 pip install 후 etl.py 실행
+    command: bash -c "pip install --no-cache-dir -r requirements.txt && python etl.py"
+    depends_on:
+      - mongo_db
+      - postgres_db
+
+
+  ############################### Airflow services ###############################
+  # airflow-webserver:
+  #   image: apache/airflow:2.8.1
+  #   restart: always
+  #   depends_on:
+  #     - postgres_db
+  #   environment:
+  #     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+  #     AIRFLOW__CORE__EXECUTOR: LocalExecutor
+  #     AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://pguser:pgpass@postgres_db/jobdb
+  #     AIRFLOW__CORE__FERNET_KEY: "$(openssl rand -base64 32)"
+  #   volumes:
+  #     - ./dags:/opt/airflow/dags
+  #   ports:
+  #     - "8080:8080"
+  #   command: webserver
+
+  # airflow-scheduler:
+  #   image: apache/airflow:2.8.1
+  #   restart: always
+  #   depends_on:
+  #     - airflow-webserver
+  #   environment:
+  #     AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://pguser:pgpass@postgres_db/jobdb
+  #   volumes:
+  #     - ./dags:/opt/airflow/dags
+  #   command: scheduler
+
+volumes:
+  pgdata:
