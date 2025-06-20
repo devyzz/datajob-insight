@@ -11,7 +11,7 @@ crawler-service/
 ├── crontab                      # 주기실행 cron 설정
 ├── .env.example                 # 환경변수 예시 파일
 ├── main.py                     # 메인 실행 스크립트
-├── run_crawlers.sh            # 병렬 크롤러 실행 스크립트
+├── run_crawlers.sh            # 순차 크롤러 실행 스크립트
 ├── pyproject.toml             # Poetry 의존성 관리
 ├── requirements.txt           # pip 의존성 (백업용)
 ├── config/
@@ -54,22 +54,37 @@ cd crawler-service
 
 # (선택) 환경변수 파일 생성 (.env)
 echo "CRAWLER_SERVICE_MONGODB_URI=mongodb://your-mongodb-host:27017/job_crawler" > .env
-```
 
-#### 단발성 실행 (개발/테스트용)
-```bash
-# 커스텀 MongoDB URI로 실행 (*메인* 원격 몽고DB에 원티드 사람인 잡코리아 채용공고를 순차적으로 크롤링) 
-# CUSTOM_DB_IP 는 discord에서 공유한 원격 DB ip입니다!
+# 단발성 실행 (초기용) 
 CRAWLER_SERVICE_MONGODB_URI="mongodb://CUSTOM_DB_IP:27017/job_crawler" \
 docker-compose run --rm crawler ./run_crawlers.sh
 
-# 모든 사이트 크롤링 수행 (모든디폴트옵션으로 | 로컬 mongoDB | loglevel=INFO | normal모드)
+# 주기적 실행 (배치용)
+docker-compose up -d crawler-cron
+```
+
+#### 단발성 실행 (개발/테스트용)
+| ./run_crawlers.sh 사용시 
+```bash
+# 1. 매일 주기적으로 실행될 스크립트 
+# CUSTOM_DB_IP 는 discord에서 공유한 원격 mongoDB ip입니다!
+CRAWLER_SERVICE_MONGODB_URI="mongodb://CUSTOM_DB_IP:27017/job_crawler" \
 docker-compose run --rm crawler ./run_crawlers.sh
 
-# 특정 사이트만 실행
+# 2. full mode : 첫페이지부터 끝까지 모든 채용 플랫폼 공고를 한번에 긁을때 사용
+CRAWLER_SERVICE_MONGODB_URI="mongodb://CUSTOM_DB_IP:27017/job_crawler" \
+docker-compose run --rm crawler ./run_crawlers.sh full
+
+# 3. 모든디폴트옵션으로 사이트 크롤링 수행 (로컬 mongoDB | loglevel=INFO | normal모드)
+docker-compose run --rm crawler ./run_crawlers.sh 
+```
+
+| main.py 사용시(거의 테스트용)
+```bash
+# 4. 특정 사이트만 실행 
 docker-compose run --rm crawler python main.py --site wanted
 
-# 전체 크롤링 (--full모드는 첫페이지부터 끝페이지까지 다 긁는다)
+# 5. 전체 크롤링 (--full모드는 첫페이지부터 끝페이지까지 다 긁는다)
 docker-compose run --rm crawler python main.py --site wanted --full
 ```
 
@@ -399,9 +414,9 @@ find logs/ -name "*.log" -mtime +7 -delete
 ### 봇 차단 방지
 - **딜레이 준수**: 각 사이트별 설정된 딜레이 시간 준수
 - **IP 분산**: 가능하면 여러 IP에서 분산 실행
-- **시간차 실행**: 3개 사이트 동시 실행보다는 시간차를 두고 실행
+- **시간차 실행**: 3개 사이트 동시 실행보다는 순차 실행
 ```bash
-# 시간차를 둔 실행 예시
+# 시간차를 둔 실행 예시 (./run_crawlers.sh 동작은 순차적으로 하는중) 
 python main.py --site wanted && sleep 300 && \
 python main.py --site saramin && sleep 300 && \
 python main.py --site jobkorea

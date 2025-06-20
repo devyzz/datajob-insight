@@ -123,8 +123,8 @@ class JobCrawler(ABC):
         job_urls = self._get_job_urls(config, full_crawl)
         
         #3: 신규 URL 필터링
-        #new_urls = [url for url in job_urls if url not in existing_urls]
-        new_urls = job_urls #시험용으로 중복 제거 비활성화
+        new_urls = [url for url in job_urls if url not in existing_urls]
+        #new_urls = job_urls #시험용으로 중복 제거 비활성화
         
         self.logger.info(f"🆕 {site_name}: {len(new_urls)}개 신규 URL (총 {len(job_urls)}개 중)")
         

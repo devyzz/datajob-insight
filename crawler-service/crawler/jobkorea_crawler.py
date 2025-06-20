@@ -211,7 +211,7 @@ class JobkoreaCrawler(JobCrawler):
         try:
             self.logger.info("🔍 필터링된 결과에서 URL 수집 시작")
             
-            max_pages = 10 if full_crawl else config.max_pages  # 테스트용 제한
+            max_pages = 1000000 if full_crawl else config.max_pages  # 테스트용 제한
             consecutive_empty = 0
             
             for page_num in range(1, max_pages + 1):

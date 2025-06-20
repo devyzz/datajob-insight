@@ -36,7 +36,7 @@ class SaraminCrawler(JobCrawler):
             
             # 봇 탐지 회피를 위한 고급 설정
             self.browser = self.playwright.chromium.launch(
-                headless=False,  # headless를 False로 변경 (탐지 회피)
+                headless=True,  # headless를 False로 변경 (탐지 회피) -> 아니 도커로 실행하려니깐 False로는 자꾸 에러 막나네 ㅋ_ㅋ False로 하면 브라우저 띄워서 실행되서 봇 탐지 회피 안되고 더 빠르게 크롤링하는데 ㅋ_ㅋ
                 args=[
                     '--no-sandbox',
                     '--disable-blink-features=AutomationControlled',
@@ -306,7 +306,7 @@ class SaraminCrawler(JobCrawler):
         }
         
         self.session.headers.update(config.common_headers)
-        max_pages = 10 if full_crawl else config.max_pages
+        max_pages = 1000000 if full_crawl else config.max_pages
         consecutive_empty = 0
         
         self.logger.info(f"🎯 사람인 IT 카테고리 크롤링 시작 (최대 {max_pages}페이지)")
