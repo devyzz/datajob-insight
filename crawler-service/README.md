@@ -64,10 +64,10 @@ docker-compose up -d crawler-cron
 ```
 
 #### 단발성 실행 (개발/테스트용)
-| ./run_crawlers.sh 사용시 
+| run_crawlers.sh 사용시 
 ```bash
 # 1. 매일 주기적으로 실행될 스크립트 
-# CUSTOM_DB_IP 는 discord에서 공유한 원격 mongoDB ip입니다!
+  # * CUSTOM_DB_IP 는 discord에서 공유한 원격 mongoDB ip입니다!
 CRAWLER_SERVICE_MONGODB_URI="mongodb://CUSTOM_DB_IP:27017/job_crawler" \
 docker-compose run --rm crawler ./run_crawlers.sh
 
