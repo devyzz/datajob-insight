@@ -12,13 +12,15 @@ services:
       - "27017:27017"
 
   postgres_db:
-    image: postgres:14
+    image: postgres:15
     container_name: postgres_db
     restart: always
+    env_file:
+      - ./.env
     environment:
-      POSTGRES_USER: pguser
-      POSTGRES_PASSWORD: pgpass
-      POSTGRES_DB: jobdb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
