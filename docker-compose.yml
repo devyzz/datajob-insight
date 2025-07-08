@@ -39,5 +39,18 @@ services:
       - .env # .env 파일에서 환경 변수 로드
     restart: unless-stopped
 
+  web-dashboard-service:
+    build:
+      context: ./web-dashboard-service
+      dockerfile: Dockerfile
+    container_name: web_dashboard_service_container
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
 volumes:
   postgres-data:
