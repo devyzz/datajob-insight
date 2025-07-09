@@ -11,6 +11,8 @@ app = FastAPI()
 # CORS 설정 시작
 origins = [
     "http://localhost:8001", # web-jobposting-service의 주소
+    "http://localhost:8501", # web-dashboard-service의 주소
+    "http://web-dashboard-service:8501", # Docker 내부 주소
     # 필요한 경우 다른 출처도 추가
 ]
 

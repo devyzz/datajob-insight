@@ -21,4 +21,13 @@ class JobGridResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+# company 테이블에 대한 API 응답 모델
+class CompanyResponse(BaseModel):
+    company_id: int
+    company_name: str
+    company_size: str
+    
+    class Config:
+        from_attributes = True
     

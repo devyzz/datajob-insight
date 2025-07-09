@@ -41,16 +41,14 @@ services:
 
   web-dashboard-service:
     build:
-      context: ./web-dashboard-service
-      dockerfile: Dockerfile
+      context: . # 프로젝트 루트를 빌드 컨텍스트로 설정하여 _common에 접근
+      dockerfile: web-dashboard-service/Dockerfile
     container_name: web_dashboard_service_container
     ports:
       - "8501:8501"
     env_file:
       - .env
-    depends_on:
-      - postgres
     restart: unless-stopped
-
+    
 volumes:
   postgres-data:
