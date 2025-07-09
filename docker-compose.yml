@@ -39,5 +39,16 @@ services:
       - .env # .env 파일에서 환경 변수 로드
     restart: unless-stopped
 
+  web-dashboard-service:
+    build:
+      context: . # 프로젝트 루트를 빌드 컨텍스트로 설정하여 _common에 접근
+      dockerfile: web-dashboard-service/Dockerfile
+    container_name: web_dashboard_service_container
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    restart: unless-stopped
+    
 volumes:
   postgres-data:
